@@ -24,15 +24,10 @@ The algorithm is a JavaScript implementation of the **Eikonal equation** solver 
 
 ## Usage
 
-1. Serve the folder with the included no-cache dev server:
-   ```bash
-   python dev_server.py        # default port 8767
-   python dev_server.py 8080   # custom port
-   ```
-2. Open `http://localhost:8767` in your browser.
-3. Browse to an image (PNG with transparency works best).
-4. Adjust parameters and click **▶ Start**.
-5. Click **⬇ Save SVG** when done — the SVG is sized for A4 and ready to send to a pen plotter.
+1. Open the [live demo](https://raw.githack.com/rolandblok/FastMarchingTopoPlot/main/index.html) — or clone the repo and open `index.html` via any static file server.
+2. Browse to an image (PNG with transparency works best).
+3. Adjust parameters and click **▶ Start**.
+4. Click **⬇ Save SVG** when done — the SVG is sized for A4 and ready to send to a pen plotter.
 
 ---
 
@@ -59,12 +54,10 @@ The algorithm is a JavaScript implementation of the **Eikonal equation** solver 
 | `style.css` | Dark panel + white canvas |
 | `script.js` | UI, image loading, contour extraction, SVG export |
 | `worker.js` | FMM solver — Gaussian blur → speed field → Eikonal min-heap |
-| `dev_server.py` | No-cache static server (prevents stale JS/CSS) |
 
 ---
 
 ## Dependencies
 
 - [`d3-contour`](https://github.com/d3/d3-contour) v4 — loaded from CDN, can be vendored for offline use
-- Python 3 (stdlib only) for the dev server
 - No build step, no npm, no framework
