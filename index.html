@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FMM Topo</title>
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+
+<div id="panel">
+
+  <div class="group">
+    <div class="group-title">Image</div>
+    <label class="file-btn">
+      Browse…
+      <input type="file" id="file-input" accept="image/*">
+    </label>
+    <div id="img-size" class="hint"></div>
+  </div>
+
+  <hr>
+
+  <div class="group">
+    <div class="group-title">Preview</div>
+    <div class="row">
+      <label>Blur σ</label>
+      <input type="range" id="blur" min="0" max="20" step="0.1" value="0">
+      <span id="blur-val">0.0</span>
+    </div>
+    <div class="row">
+      <label>Gamma</label>
+      <input type="range" id="gamma" min="0.2" max="4" step="0.05" value="1">
+      <span id="gamma-val">1.00</span>
+    </div>
+    <div class="row">
+      <label>Scale %</label>
+      <input type="range" id="scale" min="10" max="100" step="1" value="100">
+      <span id="scale-val">100</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="group">
+    <div class="group-title">Computation</div>
+    <div class="row">
+      <label>Num lines</label>
+      <input type="range" id="numlines" min="10" max="500" step="1" value="200">
+      <span id="numlines-val">200</span>
+    </div>
+    <div class="row">
+      <label>Speed offset</label>
+      <input type="range" id="speed-offset" min="0.01" max="1.0" step="0.01" value="0.1">
+      <span id="speed-offset-val">0.10</span>
+    </div>
+    <div class="row">
+      <label>Center X</label>
+      <input type="range" id="seed-x" min="0" max="1" step="0.01" value="0.5">
+      <span id="seed-x-val">0.50</span>
+    </div>
+    <div class="row">
+      <label>Center Y</label>
+      <input type="range" id="seed-y" min="0" max="1" step="0.01" value="0.5">
+      <span id="seed-y-val">0.50</span>
+    </div>
+    <label class="check">
+      <input type="checkbox" id="skip-transp" checked>
+      Skip transparent
+    </label>
+  </div>
+
+  <hr>
+
+  <div class="group">
+    <div class="group-title">SVG output</div>
+    <div class="row">
+      <label>Stroke width</label>
+      <input type="range" id="stroke" min="0.05" max="3" step="0.05" value="0.15">
+      <span id="stroke-val">0.15</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="group">
+    <div class="group-title">View</div>
+    <label class="check">
+      <input type="checkbox" id="show-img" checked> Show image
+    </label>
+    <label class="check">
+      <input type="checkbox" id="show-topo" checked> Show topo
+    </label>
+  </div>
+
+  <hr>
+
+  <button id="start-btn" disabled>&#9654; Start</button>
+  <button id="stop-btn"  disabled>&#9632; Stop</button>
+  <button id="save-btn" disabled>⬇ Save SVG</button>
+  <label class="check" style="margin-top:2px">
+    <input type="checkbox" id="auto-save"> Auto-download when done
+  </label>
+  <progress id="progress" max="100" value="0"></progress>
+  <div id="status">Load an image to begin.</div>
+
+</div>
+
+<canvas id="canvas"></canvas>
+
+<!-- d3-contour: marching-squares contour extraction (replaces skimage.measure.find_contours) -->
+<script src="https://cdn.jsdelivr.net/npm/d3-contour@4/dist/d3-contour.min.js"></script>
+<script src="script.js?v=9"></script>
+
+</body>
+</html>
