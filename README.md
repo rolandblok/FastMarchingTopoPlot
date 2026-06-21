@@ -8,6 +8,8 @@ Pen plotter SVG line art generator. Converts a photo to topographic contour line
 
 No install needed — loads the typewriter demo automatically.
 
+**Everything runs in your browser. Your images are never uploaded anywhere.**
+
 ---
 
 ## How it works
