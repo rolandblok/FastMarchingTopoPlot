@@ -52,6 +52,7 @@ document.getElementById('file-input').addEventListener('change', e => {
     S.fullH   = img.height;
     S.paths   = [];
     document.getElementById('save-btn').disabled = true;
+    document.getElementById('show-img').checked  = true;
     applyScale();
     updatePreview();
     document.getElementById('start-btn').disabled = false;
@@ -320,6 +321,8 @@ document.getElementById('start-btn').addEventListener('click', () => {
   document.getElementById('start-btn').disabled = true;
   document.getElementById('stop-btn').disabled  = false;
   document.getElementById('save-btn').disabled  = true;
+  document.getElementById('show-img').checked   = false;
+  redraw();
 
   if (S.worker) S.worker.terminate();
   S.worker = new Worker('worker.js');
@@ -412,6 +415,7 @@ function setStatus(msg) { $status.textContent = msg; }
     S.paths   = [];
     document.getElementById('img-size').textContent = `${img.width} × ${img.height} px`;
     document.getElementById('save-btn').disabled = true;
+    document.getElementById('show-img').checked  = true;
     applyScale();
     updatePreview();
     document.getElementById('start-btn').disabled = false;
