@@ -59,6 +59,7 @@ document.getElementById('file-input').addEventListener('change', e => {
     URL.revokeObjectURL(img.src);
   };
   img.onerror = () => setStatus('Could not load image.');
+  img.crossOrigin = 'anonymous';
   img.src = URL.createObjectURL(file);
 });
 
@@ -417,5 +418,6 @@ function setStatus(msg) { $status.textContent = msg; }
     setStatus('Loaded. Press ▶ Start to compute.');
   };
   img.onerror = () => setStatus('Load an image to begin.');
+  img.crossOrigin = 'anonymous';
   img.src = 'typewriter_nobg.png';
 })();
