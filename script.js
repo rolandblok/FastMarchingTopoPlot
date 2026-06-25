@@ -51,8 +51,9 @@ document.getElementById('file-input').addEventListener('change', e => {
     S.fullW   = img.width;
     S.fullH   = img.height;
     S.paths   = [];
-    document.getElementById('save-btn').disabled = true;
-    document.getElementById('show-img').checked  = true;
+    document.getElementById('save-btn').disabled   = true;
+    document.getElementById('save-gcode').disabled = true;
+    document.getElementById('show-img').checked    = true;
     applyScale();
     updatePreview();
     document.getElementById('start-btn').disabled = false;
@@ -142,7 +143,8 @@ function updatePreview() {
   S.procCanvas = oc;
 
   S.paths = [];   // preview change invalidates old contours
-  document.getElementById('save-btn').disabled = true;
+  document.getElementById('save-btn').disabled   = true;
+  document.getElementById('save-gcode').disabled = true;
   redraw();
 }
 
@@ -289,8 +291,8 @@ function extractContours(tMap, w, h) {
         `A4: ${lenA4.toFixed(2)} m\n` +
         `A3: ${lenA3.toFixed(2)} m`
       );
-      document.getElementById('save-btn').disabled = false;
-      if (document.getElementById('auto-save').checked) saveSVG();
+      document.getElementById('save-btn').disabled   = false;
+      document.getElementById('save-gcode').disabled = false;
       finishRun();
     }
   }
@@ -320,8 +322,9 @@ document.getElementById('start-btn').addEventListener('click', () => {
   $progress.value = 0;
   document.getElementById('start-btn').disabled = true;
   document.getElementById('stop-btn').disabled  = false;
-  document.getElementById('save-btn').disabled  = true;
-  document.getElementById('show-img').checked   = false;
+  document.getElementById('save-btn').disabled   = true;
+  document.getElementById('save-gcode').disabled = true;
+  document.getElementById('show-img').checked    = false;
   redraw();
 
   if (S.worker) S.worker.terminate();
@@ -365,20 +368,44 @@ function finishRun() {
   document.getElementById('stop-btn').disabled  = true;
 }
 
+// ── paper size helper ─────────────────────────────────────────────────────────
+function getPaperDims() {
+  const preset = document.getElementById('paper-size').value;
+  let pw, ph;
+  if (preset === 'a4')       { pw = 210; ph = 297; }
+  else if (preset === 'a3')  { pw = 297; ph = 420; }
+  else {
+    pw = parseFloat(document.getElementById('paper-w').value) || 210;
+    ph = parseFloat(document.getElementById('paper-h').value) || 297;
+  }
+  if (document.getElementById('orientation').value === 'landscape') {
+    [pw, ph] = [ph, pw];
+  }
+  return { pw, ph };
+}
+
+document.getElementById('paper-size').addEventListener('change', () => {
+  document.getElementById('custom-paper').style.display =
+    document.getElementById('paper-size').value === 'custom' ? '' : 'none';
+});
+
 // ── SVG export ────────────────────────────────────────────────────────────────
 document.getElementById('save-btn').addEventListener('click', saveSVG);
 
 function saveSVG() {
   if (!S.paths.length) return;
-  const pw = 210, ph = 297;   // A4 portrait, mm
-  const sw = getStroke();
+  const { pw, ph } = getPaperDims();
+  const marginPct = (parseFloat(document.getElementById('svg-margin').value) || 0) / 100;
+  const sw        = getStroke();
 
-  // Uniform scale to fit image inside A4, preserving aspect ratio
-  const scale = Math.min(pw / S.imgW, ph / S.imgH);
+  const drawW = pw * (1 - 2 * marginPct);
+  const drawH = ph * (1 - 2 * marginPct);
+  const margin = pw * marginPct;
+  const scale = Math.min(drawW / S.imgW, drawH / S.imgH);
   const dw    = S.imgW * scale;
   const dh    = S.imgH * scale;
-  const ox    = (pw - dw) / 2;   // center horizontally
-  const oy    = (ph - dh) / 2;   // center vertically
+  const ox    = margin + (drawW - dw) / 2;
+  const oy    = margin + (drawH - dh) / 2;
 
   const rows = [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${pw}mm" height="${ph}mm" viewBox="0 0 ${pw} ${ph}">`,
@@ -401,6 +428,55 @@ function saveSVG() {
   URL.revokeObjectURL(a.href);
 }
 
+// ── G-code export ─────────────────────────────────────────────────────────────
+document.getElementById('save-gcode').addEventListener('click', saveGcode);
+
+function saveGcode() {
+  if (!S.paths.length) return;
+  const { pw, ph } = getPaperDims();
+  const marginPct = (parseFloat(document.getElementById('svg-margin').value) || 0) / 100;
+  const zDown  = document.getElementById('gcode-z-down').value.trim() || 'M3 S40';
+  const zUp    = document.getElementById('gcode-z-up').value.trim() || 'M3 S40';
+  const fDraw  = parseFloat(document.getElementById('gcode-f-draw').value) || 3000;
+  const fMove  = parseFloat(document.getElementById('gcode-f-move').value) || 3000;
+
+  const drawW = pw * (1 - 2 * marginPct);
+  const drawH = ph * (1 - 2 * marginPct);
+  const margin = pw * marginPct;
+  const scale = Math.min(drawW / S.imgW, drawH / S.imgH);
+  const dw    = S.imgW * scale;
+  const dh    = S.imgH * scale;
+  const ox    = margin + (drawW - dw) / 2;
+  const oy    = margin + (drawH - dh) / 2;
+
+  const lines = [
+    'G21 ; mm',
+    'G90 ; absolute',
+    zUp,
+  ];
+  for (const path of S.paths) {
+    if (path.length < 2) continue;
+    const [x0, y0] = path[0];
+    lines.push(`G0 X${(ox + x0 * scale).toFixed(3)} Y${(oy + y0 * scale).toFixed(3)} F${fMove}`);
+    lines.push(zDown);
+    for (let i = 1; i < path.length; i++) {
+      const [x, y] = path[i];
+      lines.push(`G1 X${(ox + x * scale).toFixed(3)} Y${(oy + y * scale).toFixed(3)} F${fDraw}`);
+    }
+    lines.push(zUp);
+  }
+  lines.push(`G0 X0 Y0 F${fMove}`);
+  lines.push(zUp);
+
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+  const a    = Object.assign(document.createElement('a'), {
+    href:     URL.createObjectURL(blob),
+    download: 'fmm_topo.gcode',
+  });
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
 // ── utils ─────────────────────────────────────────────────────────────────────
 function setStatus(msg) { $status.textContent = msg; }
 
@@ -414,8 +490,9 @@ function setStatus(msg) { $status.textContent = msg; }
     S.fullH   = img.height;
     S.paths   = [];
     document.getElementById('img-size').textContent = `${img.width} × ${img.height} px`;
-    document.getElementById('save-btn').disabled = true;
-    document.getElementById('show-img').checked  = true;
+    document.getElementById('save-btn').disabled   = true;
+    document.getElementById('save-gcode').disabled = true;
+    document.getElementById('show-img').checked    = true;
     applyScale();
     updatePreview();
     document.getElementById('start-btn').disabled = false;

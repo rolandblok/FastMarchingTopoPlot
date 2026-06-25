@@ -73,17 +73,6 @@
   <hr>
 
   <div class="group">
-    <div class="group-title">SVG output</div>
-    <div class="row">
-      <label>Stroke width</label>
-      <input type="range" id="stroke" min="0.05" max="3" step="0.05" value="0.15">
-      <span id="stroke-val">0.15</span>
-    </div>
-  </div>
-
-  <hr>
-
-  <div class="group">
     <div class="group-title">View</div>
     <label class="check">
       <input type="checkbox" id="show-img" checked> Show image
@@ -97,12 +86,74 @@
 
   <button id="start-btn" disabled>&#9654; Start</button>
   <button id="stop-btn"  disabled>&#9632; Stop</button>
-  <button id="save-btn" disabled>Save SVG</button>
-  <label class="check" style="margin-top:2px">
-    <input type="checkbox" id="auto-save"> Auto-download when done
-  </label>
   <progress id="progress" max="100" value="0"></progress>
   <div id="status">Load an image to begin.</div>
+
+  <hr>
+
+  <div class="group">
+    <div class="group-title">SVG output</div>
+    <div class="row">
+      <label>Stroke width</label>
+      <input type="range" id="stroke" min="0.05" max="3" step="0.05" value="0.15">
+      <span id="stroke-val">0.15</span>
+    </div>
+    <div class="row">
+      <label>Paper size</label>
+      <select id="paper-size">
+        <option value="a4">A4</option>
+        <option value="a3">A3</option>
+        <option value="custom">Custom</option>
+      </select>
+    </div>
+    <div id="custom-paper" style="display:none">
+      <div class="row">
+        <label>Width (mm)</label>
+        <input type="number" id="paper-w" value="210" min="10" max="2000" step="1">
+      </div>
+      <div class="row">
+        <label>Height (mm)</label>
+        <input type="number" id="paper-h" value="297" min="10" max="2000" step="1">
+      </div>
+    </div>
+    <div class="row">
+      <label>Orientation</label>
+      <select id="orientation">
+        <option value="portrait">Portrait</option>
+        <option value="landscape">Landscape</option>
+      </select>
+    </div>
+    <div class="row">
+      <label>Margin %</label>
+      <input type="number" id="svg-margin" value="5" min="0" max="40" step="0.5">
+    </div>
+  </div>
+
+  <button id="save-btn" disabled>Save SVG</button>
+
+  <hr>
+
+  <div class="group">
+    <div class="group-title">G-code output</div>
+    <div class="row">
+      <label>Pen down</label>
+      <input type="text" id="gcode-z-down" value="M3 S20">
+    </div>
+    <div class="row">
+      <label>Pen up</label>
+      <input type="text" id="gcode-z-up" value="M5">
+    </div>
+    <div class="row">
+      <label>Write speed</label>
+      <input type="number" id="gcode-f-draw" value="3000" min="1" max="30000" step="100">
+    </div>
+    <div class="row">
+      <label>Move speed</label>
+      <input type="number" id="gcode-f-move" value="3000" min="1" max="30000" step="100">
+    </div>
+  </div>
+
+  <button id="save-gcode" disabled>Save G-code</button>
 
 </div>
 

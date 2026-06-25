@@ -100,8 +100,10 @@ button:disabled { opacity: .35; cursor: default; }
 #start-btn { border-color: #3a6aaa; color: #90c0ff; }
 #start-btn:hover:not(:disabled) { background: #1e3a5f; }
 
-#save-btn:not(:disabled) { border-color: #3a6aaa; color: #90c0ff; }
-#save-btn:hover:not(:disabled) { background: #1e3a5f; }
+#save-btn:not(:disabled),
+#save-gcode:not(:disabled)       { border-color: #3a6aaa; color: #90c0ff; }
+#save-btn:hover:not(:disabled),
+#save-gcode:hover:not(:disabled) { background: #1e3a5f; }
 
 .file-btn { border-color: #3a6aaa; color: #90c0ff; }
 .file-btn:hover { background: #1e3a5f; }
@@ -121,6 +123,20 @@ button:disabled { opacity: .35; cursor: default; }
   white-space: pre-wrap;
   line-height: 1.55;
 }
+
+/* number inputs + selects */
+.row input[type=number],
+.row select {
+  flex: 1;
+  min-width: 0;
+  background: #303030;
+  color: #d0d0d0;
+  border: 1px solid #4a4a4a;
+  border-radius: 3px;
+  padding: 2px 4px;
+  font-size: 12px;
+}
+.row select { cursor: pointer; }
 
 /* ── canvas ── */
 #canvas { flex: 1; min-width: 0; min-height: 0; width: 0; height: 100%; background: #fff; display: block; }
